@@ -1,0 +1,30 @@
+name: iOS Build
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate
+      - name: Build simulator app
+        run: |
+          xcodebuild -project SamsungRemotePlus.xcodeproj -scheme SamsungRemotePlus -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
+      - name: Build unsigned iPhone app
+        run: |
+          xcodebuild -project SamsungRemotePlus.xcodeproj -scheme SamsungRemotePlus -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath "$RUNNER_TEMP/remote-build" CODE_SIGNING_ALLOWED=NO build
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p "$RUNNER_TEMP/ipa/Payload"
+          cp -R "$RUNNER_TEMP/remote-build/Build/Products/Release-iphoneos/SamsungRemotePlus.app" "$RUNNER_TEMP/ipa/Payload/"
+          cd "$RUNNER_TEMP/ipa"
+          zip -qr "$GITHUB_WORKSPACE/SamsungRemotePlus-unsigned.ipa" Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SamsungRemotePlus-unsigned-ipa
+          path: SamsungRemotePlus-unsigned.ipa
+          if-no-files-found: error
