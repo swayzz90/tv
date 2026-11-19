@@ -1,0 +1,26 @@
+name: SamsungRemotePlus
+options:
+  bundleIdPrefix: de.wohnzimmer
+settings:
+  base:
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    SWIFT_VERSION: "5.0"
+targets:
+  SamsungRemotePlus:
+    type: application
+    platform: iOS
+    sources:
+      - SamsungRemotePlus
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: de.wohnzimmer.samsungremoteplus
+        TARGETED_DEVICE_FAMILY: "1"
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+    info:
+      path: SamsungRemotePlus/Info.plist
+      properties:
+        CFBundleDisplayName: Remote+
+        NSLocalNetworkUsageDescription: "Die App benötigt Zugriff auf dein Heimnetzwerk, um den Samsung-Fernseher zu steuern."
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
