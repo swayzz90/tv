@@ -1,21 +1,37 @@
 name: iOS Build
+
 on:
   push:
+    branches: [main]
   workflow_dispatch:
+
+# Beim Hochladen mehrerer Dateien nicht viele macOS-Runner gleichzeitig anfordern.
+concurrency:
+  group: ios-build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
-    runs-on: macos-latest
+    # Explizite Runner-Version statt dynamischer "macos-latest"-Zuordnung.
+    runs-on: macos-15
+    timeout-minutes: 30
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+      - name: Xcode version
+        run: xcodebuild -version
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Generate Xcode project
         run: xcodegen generate
       - name: Build simulator app
         run: |
+          set -o pipefail
           xcodebuild -project SamsungRemotePlus.xcodeproj -scheme SamsungRemotePlus -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
       - name: Build unsigned iPhone app
         run: |
+          set -o pipefail
           xcodebuild -project SamsungRemotePlus.xcodeproj -scheme SamsungRemotePlus -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath "$RUNNER_TEMP/remote-build" CODE_SIGNING_ALLOWED=NO build
       - name: Package unsigned IPA
         run: |
