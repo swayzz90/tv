@@ -12,8 +12,8 @@ concurrency:
 
 jobs:
   build:
-    # Explizite Runner-Version statt dynamischer "macos-latest"-Zuordnung.
-    runs-on: macos-15
+    # Standard-Intel-macOS-Runner, um Engpässe der ARM64-Runner zu umgehen.
+    runs-on: macos-15-intel
     timeout-minutes: 30
     permissions:
       contents: read
